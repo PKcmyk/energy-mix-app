@@ -18,9 +18,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class EnergyMixService {
 
     static final Set<String> CLEAN_FUELS = Set.of("biomass", "nuclear", "hydro", "wind", "solar");
@@ -31,11 +33,6 @@ public class EnergyMixService {
 
     private final CarbonIntensityClient client;
     private final Clock clock;
-
-    public EnergyMixService(CarbonIntensityClient client, Clock clock) {
-        this.client = client;
-        this.clock = clock;
-    }
 
     public List<DailyMixDto> getThreeDayMix() {
         LocalDate today = LocalDate.now(clock);

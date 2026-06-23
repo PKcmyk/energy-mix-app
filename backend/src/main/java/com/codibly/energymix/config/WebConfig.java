@@ -1,18 +1,17 @@
 package com.codibly.energymix.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
+    @Value("${app.cors.allowed-origins}")
     private final String[] allowedOrigins;
-
-    public WebConfig(@Value("${app.cors.allowed-origins}") String[] allowedOrigins) {
-        this.allowedOrigins = allowedOrigins;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
