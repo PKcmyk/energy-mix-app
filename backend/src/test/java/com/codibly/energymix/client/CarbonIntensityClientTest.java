@@ -30,6 +30,7 @@ class CarbonIntensityClientTest {
 
     @Test
     void buildsUnencodedUriAndDeserialisesResponse() {
+        // given
         String body =
                 """
                 {
@@ -49,11 +50,13 @@ class CarbonIntensityClientTest {
                 .andExpect(method(GET))
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
+        // when
         GenerationResponse response =
                 client.getGeneration(
                         Instant.parse("2026-06-23T00:00:00Z"),
                         Instant.parse("2026-06-23T03:00:00Z"));
 
+        // then
         server.verify();
         assertThat(response.data()).hasSize(1);
         assertThat(response.data().get(0).generationmix())

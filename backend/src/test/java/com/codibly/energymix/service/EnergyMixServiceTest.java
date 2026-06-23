@@ -37,6 +37,7 @@ class EnergyMixServiceTest {
 
     @Test
     void groupsPeriodsByDayAndAveragesEachFuel() {
+        // given
         List<GenerationPeriod> periods = new ArrayList<>();
         periods.add(period("2026-06-23T10:00:00Z", share("wind", 20), share("gas", 80)));
         periods.add(period("2026-06-23T10:30:00Z", share("wind", 40), share("gas", 60)));
@@ -46,8 +47,10 @@ class EnergyMixServiceTest {
         periods.add(period("2026-06-25T10:30:00Z", share("nuclear", 50), share("gas", 50)));
         when(client.getGeneration(any(), any())).thenReturn(new GenerationResponse(periods));
 
+        // when
         List<DailyMixDto> result = service().getThreeDayMix();
 
+        // then
         assertThat(result).hasSize(3);
         assertThat(result.get(0).date()).hasToString("2026-06-23");
         assertThat(result.get(0).generationMix())
@@ -61,6 +64,7 @@ class EnergyMixServiceTest {
 
     @Test
     void returnsEmptyDayWhenApiHasNoDataForIt() {
+        // given
         when(client.getGeneration(any(), any()))
                 .thenReturn(
                         new GenerationResponse(
@@ -70,8 +74,10 @@ class EnergyMixServiceTest {
                                                 share("wind", 50),
                                                 share("gas", 50)))));
 
+        // when
         List<DailyMixDto> result = service().getThreeDayMix();
 
+        // then
         assertThat(result).hasSize(3);
         assertThat(result.get(1).generationMix()).isEmpty();
         assertThat(result.get(1).cleanEnergyPercentage()).isZero();
@@ -79,6 +85,7 @@ class EnergyMixServiceTest {
 
     @Test
     void picksWindowWithHighestCleanShare() {
+        // given
         List<GenerationPeriod> periods =
                 List.of(
                         period("2026-06-24T10:00:00Z", share("wind", 10)),
@@ -89,8 +96,10 @@ class EnergyMixServiceTest {
                         period("2026-06-24T12:30:00Z", share("wind", 70)));
         when(client.getGeneration(any(), any())).thenReturn(new GenerationResponse(periods));
 
+        // when
         ChargingWindowDto window = service().getOptimalChargingWindow(2);
 
+        // then
         assertThat(window.start()).isEqualTo(OffsetDateTime.parse("2026-06-24T11:00:00Z"));
         assertThat(window.end()).isEqualTo(OffsetDateTime.parse("2026-06-24T13:00:00Z"));
         assertThat(window.averageCleanEnergyPercentage()).isEqualTo(83.75);
@@ -98,6 +107,7 @@ class EnergyMixServiceTest {
 
     @Test
     void chargingWindowMaySpanMidnight() {
+        // given
         List<GenerationPeriod> periods =
                 List.of(
                         period("2026-06-24T22:00:00Z", share("wind", 10)),
@@ -108,8 +118,10 @@ class EnergyMixServiceTest {
                         period("2026-06-25T00:30:00Z", share("wind", 88)));
         when(client.getGeneration(any(), any())).thenReturn(new GenerationResponse(periods));
 
+        // when
         ChargingWindowDto window = service().getOptimalChargingWindow(2);
 
+        // then
         assertThat(window.start()).isEqualTo(OffsetDateTime.parse("2026-06-24T23:00:00Z"));
         assertThat(window.end()).isEqualTo(OffsetDateTime.parse("2026-06-25T01:00:00Z"));
         assertThat(window.averageCleanEnergyPercentage()).isEqualTo(91.25);
@@ -117,6 +129,7 @@ class EnergyMixServiceTest {
 
     @Test
     void skipsWindowsThatAreNotContiguous() {
+        // given
         List<GenerationPeriod> periods =
                 List.of(
                         period("2026-06-24T10:00:00Z", share("wind", 10)),
@@ -125,25 +138,30 @@ class EnergyMixServiceTest {
                         period("2026-06-24T13:30:00Z", share("wind", 99)));
         when(client.getGeneration(any(), any())).thenReturn(new GenerationResponse(periods));
 
+        // when
         ChargingWindowDto window = service().getOptimalChargingWindow(1);
 
+        // then
         assertThat(window.start()).isEqualTo(OffsetDateTime.parse("2026-06-24T13:00:00Z"));
         assertThat(window.averageCleanEnergyPercentage()).isEqualTo(99.0);
     }
 
     @Test
     void throwsWhenNotEnoughForecastData() {
+        // given
         when(client.getGeneration(any(), any()))
                 .thenReturn(
                         new GenerationResponse(
                                 List.of(period("2026-06-24T10:00:00Z", share("wind", 50)))));
 
+        // when / then
         assertThatThrownBy(() -> service().getOptimalChargingWindow(3))
                 .isInstanceOf(InsufficientForecastDataException.class);
     }
 
     @Test
     void rejectsHoursOutsideAllowedRange() {
+        // when / then
         assertThatThrownBy(() -> service().getOptimalChargingWindow(0))
                 .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> service().getOptimalChargingWindow(7))

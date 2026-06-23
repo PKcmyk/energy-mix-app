@@ -29,6 +29,7 @@ class EnergyMixControllerTest {
 
     @Test
     void returnsThreeDayMix() throws Exception {
+        // given
         when(service.getThreeDayMix())
                 .thenReturn(
                         List.of(
@@ -37,6 +38,7 @@ class EnergyMixControllerTest {
                                         Map.of("wind", 30.0, "gas", 70.0),
                                         30.0)));
 
+        // when / then
         mockMvc.perform(get("/api/energy-mix"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].date").value("2026-06-23"))
@@ -46,6 +48,7 @@ class EnergyMixControllerTest {
 
     @Test
     void returnsChargingWindow() throws Exception {
+        // given
         when(service.getOptimalChargingWindow(3))
                 .thenReturn(
                         new ChargingWindowDto(
@@ -53,6 +56,7 @@ class EnergyMixControllerTest {
                                 OffsetDateTime.parse("2026-06-24T14:00:00Z"),
                                 83.75));
 
+        // when / then
         mockMvc.perform(get("/api/charging-window").param("hours", "3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.start").value("2026-06-24T11:00:00Z"))
@@ -62,20 +66,24 @@ class EnergyMixControllerTest {
 
     @Test
     void rejectsHoursAboveMaximum() throws Exception {
+        // when / then
         mockMvc.perform(get("/api/charging-window").param("hours", "7"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void rejectsMissingHours() throws Exception {
+        // when / then
         mockMvc.perform(get("/api/charging-window")).andExpect(status().isBadRequest());
     }
 
     @Test
     void mapsInsufficientForecastToUnprocessableEntity() throws Exception {
+        // given
         when(service.getOptimalChargingWindow(anyInt()))
                 .thenThrow(new InsufficientForecastDataException("no data"));
 
+        // when / then
         mockMvc.perform(get("/api/charging-window").param("hours", "6"))
                 .andExpect(status().isUnprocessableContent());
     }
