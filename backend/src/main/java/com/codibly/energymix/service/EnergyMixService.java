@@ -7,6 +7,8 @@ import com.codibly.energymix.client.dto.GenerationResponse;
 import com.codibly.energymix.config.AppConfig;
 import com.codibly.energymix.dto.ChargingWindowDto;
 import com.codibly.energymix.dto.DailyMixDto;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,8 +22,10 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class EnergyMixService {
 
@@ -53,10 +57,7 @@ public class EnergyMixService {
         return result;
     }
 
-    public ChargingWindowDto getOptimalChargingWindow(int hours) {
-        if (hours < 1 || hours > 6) {
-            throw new IllegalArgumentException("hours must be between 1 and 6, was " + hours);
-        }
+    public ChargingWindowDto getOptimalChargingWindow(@Min(1) @Max(6) int hours) {
         int windowSize = hours * INTERVALS_PER_HOUR;
 
         LocalDate today = LocalDate.now(clock);

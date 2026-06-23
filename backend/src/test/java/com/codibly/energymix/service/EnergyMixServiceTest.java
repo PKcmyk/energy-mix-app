@@ -11,6 +11,9 @@ import com.codibly.energymix.client.dto.GenerationPeriod;
 import com.codibly.energymix.client.dto.GenerationResponse;
 import com.codibly.energymix.dto.ChargingWindowDto;
 import com.codibly.energymix.dto.DailyMixDto;
+import jakarta.validation.Validation;
+import jakarta.validation.executable.ExecutableValidator;
+import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -160,12 +163,16 @@ class EnergyMixServiceTest {
     }
 
     @Test
-    void rejectsHoursOutsideAllowedRange() {
+    void rejectsHoursOutsideAllowedRange() throws Exception {
+        // given
+        ExecutableValidator validator =
+                Validation.buildDefaultValidatorFactory().getValidator().forExecutables();
+        Method method = EnergyMixService.class.getMethod("getOptimalChargingWindow", int.class);
+
         // when / then
-        assertThatThrownBy(() -> service().getOptimalChargingWindow(0))
-                .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> service().getOptimalChargingWindow(7))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(validator.validateParameters(service(), method, new Object[] {0})).isNotEmpty();
+        assertThat(validator.validateParameters(service(), method, new Object[] {7})).isNotEmpty();
+        assertThat(validator.validateParameters(service(), method, new Object[] {3})).isEmpty();
     }
 
     private static GenerationPeriod period(String fromIso, FuelShare... shares) {
