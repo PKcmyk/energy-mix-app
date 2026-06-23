@@ -7,7 +7,7 @@ Built for the Codibly IT Academy recruitment task. Monorepo with a Spring Boot b
 
 | Part | Stack | Folder |
 |------|-------|--------|
-| Backend | Java 21 · Spring Boot 3.4 · `RestClient` | [`backend/`](./backend) |
+| Backend | Java 25 · Spring Boot 4.1 · Gradle · `RestClient` | [`backend/`](./backend) |
 | Frontend | React 18 · TypeScript · Vite · Recharts | [`frontend/`](./frontend) |
 
 Data source: the public [UK Carbon Intensity API](https://carbonintensity.github.io/api-definitions/#get-generation-from-to).
@@ -75,10 +75,11 @@ docker compose up --build
 
 ### Option B — run each part directly
 
-**Backend** (needs JDK 21+):
+**Backend** (needs JDK 25+):
 ```bash
 cd backend
-./mvnw spring-boot:run        # or: mvn spring-boot:run
+./gradlew bootRun                                   # http://localhost:8080
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun      # localhost CORS + debug logging
 ```
 
 **Frontend** (needs Node 20+):
@@ -93,8 +94,8 @@ npm run dev                   # http://localhost:5173 (proxies /api to localhost
 ## Tests
 
 ```bash
-# Backend — 13 tests (service logic, API client, controller)
-cd backend && mvn test
+# Backend — 14 tests (service logic, API client, controller, context load)
+cd backend && ./gradlew test
 
 # Frontend — 8 tests (API client, components)
 cd frontend && npm test
