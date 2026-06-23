@@ -84,9 +84,8 @@ cd backend
 **Frontend** (needs Node 20+):
 ```bash
 cd frontend
-cp .env.example .env          # points VITE_API_URL at the backend
 npm install
-npm run dev                   # http://localhost:5173
+npm run dev                   # http://localhost:5173 (proxies /api to localhost:8080)
 ```
 
 ---
@@ -111,9 +110,9 @@ window-selection algorithm (including the cross-midnight and non-contiguous case
 Both services deploy as Docker web services. Either use the [`render.yaml`](./render.yaml) blueprint, or create
 two web services manually:
 
-1. **Backend** — root directory `backend`, runtime *Docker*. Set `CORS_ALLOWED_ORIGINS` to the frontend URL.
-2. **Frontend** — root directory `frontend`, runtime *Docker*. Set `VITE_API_URL` to the backend URL
-   (it is baked into the static bundle at build time).
+1. **Backend** — root directory `backend`, runtime *Docker*. No env vars required.
+2. **Frontend** — root directory `frontend`, runtime *Docker*. Set `BACKEND_URL` to the backend's public
+   URL. nginx proxies `/api` to it, so the browser only ever talks to the frontend origin (no CORS needed).
 
 Both Dockerfiles bind to the `PORT` env var that Render injects.
 

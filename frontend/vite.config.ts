@@ -5,6 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // Local dev: forward "/api" to the backend so the frontend can use relative URLs.
+    proxy: {
+      '/api': 'http://localhost:8080',
+    },
   },
   test: {
     globals: true,

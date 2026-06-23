@@ -1,6 +1,9 @@
 import type { ChargingWindow, DailyMix } from './types';
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8080').replace(/\/$/, '');
+// Defaults to same-origin relative requests ("/api/..."). In production nginx proxies
+// "/api" to the backend; during local dev Vite's dev-server proxy does the same.
+// Set VITE_API_URL only if you want to call a backend on a different origin directly.
+const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 async function request<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`);

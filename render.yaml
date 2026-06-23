@@ -1,6 +1,7 @@
 # Render blueprint — provisions both services from this monorepo.
-# After connecting the repo in Render, set the frontend's VITE_API_URL to the
-# backend's public URL, and the backend's CORS_ALLOWED_ORIGINS to the frontend URL.
+# After connecting the repo in Render, set the frontend's BACKEND_URL to the
+# backend's public URL (e.g. https://energy-mix-backend-xxxx.onrender.com).
+# nginx proxies "/api" to it, so no CORS configuration is required.
 services:
   - type: web
     name: energy-mix-backend
@@ -8,9 +9,6 @@ services:
     rootDir: backend
     dockerfilePath: ./Dockerfile
     healthCheckPath: /
-    envVars:
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false
 
   - type: web
     name: energy-mix-frontend
@@ -18,5 +16,5 @@ services:
     rootDir: frontend
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: VITE_API_URL
+      - key: BACKEND_URL
         sync: false
