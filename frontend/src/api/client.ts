@@ -1,8 +1,5 @@
 import type { ChargingWindow, DailyMix } from './types';
 
-// Defaults to same-origin relative requests ("/api/..."). In production nginx proxies
-// "/api" to the backend; during local dev Vite's dev-server proxy does the same.
-// Set VITE_API_URL only if you want to call a backend on a different origin directly.
 const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 async function request<T>(path: string): Promise<T> {
@@ -13,7 +10,6 @@ async function request<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** Tries to surface the backend's JSON error message, falling back to a generic one. */
 async function errorMessage(response: Response): Promise<string> {
   try {
     const body = await response.json();
@@ -21,7 +17,6 @@ async function errorMessage(response: Response): Promise<string> {
       return body.message;
     }
   } catch {
-    // body was not JSON — ignore and use the fallback below
   }
   return `Request failed with status ${response.status}`;
 }

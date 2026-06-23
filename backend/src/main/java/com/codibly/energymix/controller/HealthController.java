@@ -1,11 +1,9 @@
 package com.codibly.energymix.controller;
 
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
-/** Lightweight liveness endpoint used by the hosting platform's health check. */
 @RestController
 public class HealthController {
 

@@ -1,7 +1,5 @@
-/** Sources considered "clean" for this task. */
 export const CLEAN_FUELS = new Set(['biomass', 'nuclear', 'hydro', 'wind', 'solar']);
 
-/** Stable colours per fuel so the three charts stay visually consistent. */
 export const FUEL_COLORS: Record<string, string> = {
   biomass: '#6a994e',
   nuclear: '#9d4edd',

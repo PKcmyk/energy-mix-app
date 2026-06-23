@@ -1,19 +1,18 @@
 package com.codibly.energymix.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 import com.codibly.energymix.client.dto.GenerationResponse;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.http.HttpMethod.GET;
 
 class CarbonIntensityClientTest {
 
@@ -31,7 +30,8 @@ class CarbonIntensityClientTest {
 
     @Test
     void buildsUnencodedUriAndDeserialisesResponse() {
-        String body = """
+        String body =
+                """
                 {
                   "data": [
                     {
@@ -49,9 +49,10 @@ class CarbonIntensityClientTest {
                 .andExpect(method(GET))
                 .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
-        GenerationResponse response = client.getGeneration(
-                Instant.parse("2026-06-23T00:00:00Z"),
-                Instant.parse("2026-06-23T03:00:00Z"));
+        GenerationResponse response =
+                client.getGeneration(
+                        Instant.parse("2026-06-23T00:00:00Z"),
+                        Instant.parse("2026-06-23T03:00:00Z"));
 
         server.verify();
         assertThat(response.data()).hasSize(1);

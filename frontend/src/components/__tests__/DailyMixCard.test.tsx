@@ -14,9 +14,7 @@ describe('DailyMixCard', () => {
       />,
     );
 
-    // Clean-energy badge
     expect(screen.getByText('45.0%')).toBeInTheDocument();
-    // Legend rows
     expect(screen.getByText(/Wind/)).toBeInTheDocument();
     expect(screen.getByText(/Solar/)).toBeInTheDocument();
     expect(screen.getByText('55.0%')).toBeInTheDocument();
