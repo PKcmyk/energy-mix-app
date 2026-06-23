@@ -11,34 +11,34 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-/**
- * Translates exceptions into small, consistent JSON error bodies.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    public record ApiError(int status, String message) {
-    }
+    public record ApiError(int status, String message) {}
 
     @ExceptionHandler({
-            HandlerMethodValidationException.class,
-            ConstraintViolationException.class,
-            MissingServletRequestParameterException.class,
-            MethodArgumentTypeMismatchException.class,
-            IllegalArgumentException.class
+        HandlerMethodValidationException.class,
+        ConstraintViolationException.class,
+        MissingServletRequestParameterException.class,
+        MethodArgumentTypeMismatchException.class,
+        IllegalArgumentException.class
     })
     public ResponseEntity<ApiError> handleBadRequest(Exception ex) {
-        return build(HttpStatus.BAD_REQUEST, "Invalid request: the 'hours' parameter must be an integer between 1 and 6.");
+        return build(
+                HttpStatus.BAD_REQUEST,
+                "Invalid request: the 'hours' parameter must be an integer between 1 and 6.");
     }
 
     @ExceptionHandler(InsufficientForecastDataException.class)
     public ResponseEntity<ApiError> handleInsufficientData(InsufficientForecastDataException ex) {
-        return build(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+        return build(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
     }
 
     @ExceptionHandler(RestClientException.class)
     public ResponseEntity<ApiError> handleUpstream(RestClientException ex) {
-        return build(HttpStatus.BAD_GATEWAY, "Failed to reach the Carbon Intensity API. Please try again later.");
+        return build(
+                HttpStatus.BAD_GATEWAY,
+                "Failed to reach the Carbon Intensity API. Please try again later.");
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,7 +1,3 @@
-# Render blueprint — provisions both services from this monorepo.
-# After connecting the repo in Render, set the frontend's BACKEND_URL to the
-# backend's public URL (e.g. https://energy-mix-backend-xxxx.onrender.com).
-# nginx proxies "/api" to it, so no CORS configuration is required.
 services:
   - type: web
     name: energy-mix-backend

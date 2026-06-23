@@ -1,15 +1,13 @@
-# --- Build stage ---
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM eclipse-temurin:25-jdk AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn -B dependency:go-offline
+COPY gradlew settings.gradle build.gradle gradle.properties ./
+COPY gradle ./gradle
+RUN ./gradlew --no-daemon help
 COPY src ./src
-RUN mvn -B -DskipTests package
+RUN ./gradlew --no-daemon clean bootJar
 
-# --- Runtime stage ---
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
-COPY --from=build /app/target/energy-mix-backend-0.0.1.jar app.jar
-# Spring reads the port from the PORT env var (defaults to 8080); Render sets it automatically.
+COPY --from=build /app/build/libs/energy-mix-backend-0.0.1.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
