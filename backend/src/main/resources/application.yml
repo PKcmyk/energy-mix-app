@@ -4,11 +4,13 @@ server:
 spring:
   application:
     name: energy-mix-backend
+  cache:
+    cache-names: generation
+    caffeine:
+      spec: maximumSize=64,expireAfterWrite=30m
 
 app:
   carbon-intensity:
-    # Public UK Carbon Intensity API; override per environment if needed.
     base-url: ${CARBON_INTENSITY_BASE_URL:https://api.carbonintensity.org.uk}
   cors:
-    # Comma-separated list of allowed front-end origins. "*" allows any origin.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
