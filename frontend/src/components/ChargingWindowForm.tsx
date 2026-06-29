@@ -11,6 +11,7 @@ export function ChargingWindowForm() {
   const [result, setResult] = useState<ChargingWindow | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [waking, setWaking] = useState(false);
 
   const outOfRange = hours < MIN_HOURS || hours > MAX_HOURS || !Number.isInteger(hours);
 
@@ -21,14 +22,16 @@ export function ChargingWindowForm() {
       return;
     }
     setLoading(true);
+    setWaking(false);
     setError(null);
     setResult(null);
     try {
-      setResult(await fetchChargingWindow(hours));
+      setResult(await fetchChargingWindow(hours, { onWake: () => setWaking(true) }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setLoading(false);
+      setWaking(false);
     }
   }
 
@@ -58,6 +61,11 @@ export function ChargingWindowForm() {
         </p>
       </form>
 
+      {waking && (
+        <p className="status">
+          Waking the backend up — free hosting sleeps when idle, this can take up to a minute…
+        </p>
+      )}
       {error && (
         <p className="status status--error" role="alert">
           {error}

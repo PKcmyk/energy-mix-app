@@ -37,4 +37,25 @@ describe('api client', () => {
 
     await expect(fetchChargingWindow(9)).rejects.toThrow('bad hours');
   });
+
+  it('retries 502 cold-start responses until the backend wakes up', async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({ ok: false, status: 502, json: async () => ({}) })
+        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      vi.stubGlobal('fetch', fetchMock);
+      const onWake = vi.fn();
+
+      const promise = fetchEnergyMix({ onWake });
+      await vi.runAllTimersAsync();
+      await promise;
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(onWake).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

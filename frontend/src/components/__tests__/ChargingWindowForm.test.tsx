@@ -23,7 +23,7 @@ describe('ChargingWindowForm', () => {
     render(<ChargingWindowForm />);
     await userEvent.click(screen.getByRole('button', { name: /find greenest window/i }));
 
-    expect(mockedFetch).toHaveBeenCalledWith(3);
+    expect(mockedFetch).toHaveBeenCalledWith(3, expect.objectContaining({ onWake: expect.any(Function) }));
     expect(await screen.findByText(/greenest time to charge/i)).toBeInTheDocument();
     expect(screen.getByText('83.8%')).toBeInTheDocument();
   });
